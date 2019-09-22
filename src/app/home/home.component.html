@@ -1,0 +1,120 @@
+<section class="container main-section">
+  <button type="button" mdbBtn color="default" rounded="true" id="modalOpenBtn" data-toggle="modal" data-target="#basicExample"
+          (click)="frame.show()" mdbWavesEffect>Add New Task</button>
+
+<!--  task list -->
+  <ng-container *ngIf="loaded">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-md-4 filter-div">
+          <label>Filter</label>
+          <select name="filter" class="form-control" (change)="filterTask($event.target.value)">
+            <option value="none">--Select Action--</option>
+            <option *ngFor="let action of taskAction" [value]="action">{{action}}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="example-container">
+      <h4>To do</h4>
+      <div
+        cdkDropList
+        [cdkDropListData]="todo"
+        [cdkDropListConnectedTo]="[doneList]"
+        class="example-list">
+        <div class="example-box" *ngFor="let item of todo" cdkDrag>
+          <div class="container" (click)="openDialog(item)">
+            <div class="row justify-content-between task-div">
+              <div class="col-2 task-action">
+                {{item.action}}
+              </div>
+              <div class="col-5">
+                {{item.title}}<br/>
+                <span class="task-description">{{item.description}}</span>
+              </div>
+              <div class="col-3">
+                {{item.date | date: 'd/M/yy'}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="example-container">
+      <h4>Done</h4>
+      <div
+        cdkDropList
+        #doneList="cdkDropList"
+        [cdkDropListData]="done"
+        class="example-list"
+        (cdkDropListDropped)="drop($event)">
+        <div class="example-box" *ngFor="let item of done">
+          <div class="container">
+            <div class="row justify-content-between task-div">
+              <div class="col-2 task-action">
+                {{item.action}}
+              </div>
+              <div class="col-5">
+                {{item.title}}<br/>
+                <span class="task-description">{{item.description}}</span>
+              </div>
+              <div class="col-3">
+                {{item.date | date: 'd/M/yy'}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</section>
+
+<!--task modal-->
+<div mdbModal #frame="mdb-modal" class="modal fade left" id="frameModalTop" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold" *ngIf="!newTask.status">Add New Task</h4>
+        <h4 class="modal-title w-100 font-weight-bold" *ngIf="newTask.status">Update Task</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="frame.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form (ngSubmit)="addNewTask(newTask); frame.hide()" [formGroup]="taskForm">
+        <div class="modal-body mx-3">
+          <div class="md-form mb-2">
+            <label>Action</label>
+            <select class="form-control" name="action" formControlName="taskAction" required="true" [(ngModel)]="newTask.action">
+              <option *ngFor="let action of taskAction" [value]="action">{{action}}</option>
+            </select>
+          </div>
+
+          <div class="md-form mb-2">
+            <label>Title</label>
+            <input type="text" class="form-control" formControlName="taskTitle" required="true" name="title" [(ngModel)]="newTask.title"
+                   placeholder="Enter Title" >
+          </div>
+
+          <div class="md-form mb-2">
+            <label>Date</label>
+            <input type="date" class="form-control" formControlName="taskDate" min="{{currentDate | date:'yyyy-MM-dd'}}"
+                   required="true" name="date" [(ngModel)]="newTask.date" >
+          </div>
+
+          <div class="md-form mb-2">
+            <label>Description</label>
+            <input type="text" class="form-control" formControlName="taskDescription" required="true" name="description"
+                   [(ngModel)]="newTask.description" placeholder="Enter Task Description">
+          </div>
+
+        </div>
+
+        <div class="modal-footer d-flex justify-content-center">
+          <button mdbBtn color="default" type="submit" [ngClass]="{'disabled': !taskForm.valid}" [disabled]="!taskForm.valid" class="waves-light" mdbWavesEffect>Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
